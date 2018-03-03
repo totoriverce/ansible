@@ -21,13 +21,25 @@
     state: hard
     follow: yes
 
+- name: Create a symlink from another symlink
+  file:
+    src: "{{output_dir}}/soft.txt"
+    dest: "{{output_dir}}/soft2.txt"
+    follow: yes
+    state: link
+
 - name: Hard link stat
   stat:
     path: "{{output_dir}}/hard.txt"
   register: hard_stat
 
+- name: Soft link stat
+  stat:
+    path: "{{output_dir}}/soft2.txt"
+  register: soft_stat
 
-- name: Check hard link status
+- name: Check link status
   assert:
     that:
       - "hard_stat.stat.exists == true"
+      - "soft_stat.stat.exists == true"
