@@ -426,9 +426,9 @@ def main():
                     module.fail_json(path=path, msg='Error while replacing: %s' % to_native(e, nonstring='simplerepr'))
             else:
                 try:
+                    if follow and os.path.islink(b_src):
+                        b_src = os.readlink(b_src)
                     if state == 'hard':
-                        if follow and os.path.islink(b_src):
-                            b_src = os.readlink(b_src)
                         os.link(b_src, b_path)
                     else:
                         os.symlink(b_src, b_path)
