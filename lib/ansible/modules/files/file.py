@@ -438,6 +438,8 @@ def main():
                     module.fail_json(path=path, msg='Error while replacing: %s' % to_native(e, nonstring='simplerepr'))
             else:
                 try:
+                    if follow and os.path.islink(b_src):
+                        b_src = os.readlink(b_src)
                     if state == 'hard':
                         os.link(b_src, b_path)
                     else:
