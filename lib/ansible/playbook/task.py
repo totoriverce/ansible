@@ -77,6 +77,7 @@ class Task(Base, Conditional, Taggable, CollectionSearch, Notifiable, Delegatabl
     loop_control = NonInheritableFieldAttribute(isa='class', class_type=LoopControl, default=LoopControl)
     poll = NonInheritableFieldAttribute(isa='int', default=C.DEFAULT_POLL_INTERVAL)
     register = NonInheritableFieldAttribute(isa='string', static=True)
+    projection = NonInheritableFieldAttribute(isa='string', static=True)
     retries = NonInheritableFieldAttribute(isa='int')  # default is set in TaskExecutor
     until = NonInheritableFieldAttribute(isa='list', default=list)
 
@@ -293,6 +294,7 @@ class Task(Base, Conditional, Taggable, CollectionSearch, Notifiable, Delegatabl
         specially in the TaskExecutor class when evaluating loops.
         '''
         return value
+
 
     def _post_validate_environment(self, attr, value, templar):
         '''
