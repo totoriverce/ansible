@@ -327,7 +327,7 @@ class TestTaskExecutor(unittest.TestCase):
         mock_task.retries = 0
         mock_task.delay = -1
         mock_task.delegate_to = None
-        mock_task.register = 'foo'
+        mock_task.register = {'foo': '.'}
         mock_task.until = None
         mock_task.changed_when = None
         mock_task.failed_when = None
