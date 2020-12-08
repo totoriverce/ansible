@@ -405,12 +405,15 @@ class TaskExecutor:
 
     def _project(self, templar, projections, result):
         ret = {}
-            for register, projection in projections:
-                template = '{{ _projection%s }}' % projection[1:]
-                new_vars = templar.available_variables.copy()
-                new_vars['_projection'] = result
-                with templar.set_temporary_context(available_variables=new_vars):
-                    ret[register] = templar.template(template)
+        for register, projection in projections:
+            if not projection[1:]:
+                ret[register] = result
+                continue
+            template = '{{ _projection%s }}' % projection[1:]
+            new_vars = templar.available_variables.copy()
+            new_vars['_projection'] = result
+            with templar.set_temporary_context(available_variables=new_vars):
+                ret[register] = templar.template(template)
         return ret
 
     def _calculate_delegate_to(self, templar, variables):
@@ -429,7 +432,7 @@ class TaskExecutor:
             self._task.delegate_to = delegated_host_name
             variables.update(delegated_vars)
 
-    def _execute(self, variables=None):
+    def _execute(self, variables=None, from_loop=False):
         '''
         The primary workhorse of the executor system, this runs the task
         on the specified host (which may be the delegated_to host) and handles
