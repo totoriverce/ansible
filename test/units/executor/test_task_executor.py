@@ -190,7 +190,7 @@ class TestTaskExecutor(unittest.TestCase):
             variable_manager=MagicMock(),
         )
 
-        def _execute(variables):
+        def _execute(variables, from_loop=False):
             return dict(item=variables.get('item'))
 
         te._execute = MagicMock(side_effect=_execute)
