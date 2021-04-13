@@ -268,6 +268,7 @@ class TaskExecutor:
         loop_pause = self._task.loop_control.pause
         extended = self._task.loop_control.extended
         extended_allitems = self._task.loop_control.extended_allitems
+        spread = self._task.loop_control.spread
         # ensure we always have a label
         label = self._task.loop_control.label or '{{' + loop_var + '}}'
 
@@ -283,6 +284,8 @@ class TaskExecutor:
         for item_index, item in enumerate(items):
             task_vars['ansible_loop_var'] = loop_var
 
+            if spread:
+                task_vars.update(item)
             task_vars[loop_var] = item
             if index_var:
                 task_vars['ansible_index_var'] = index_var
