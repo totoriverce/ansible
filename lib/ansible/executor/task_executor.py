@@ -284,7 +284,7 @@ class TaskExecutor:
         for item_index, item in enumerate(items):
             task_vars['ansible_loop_var'] = loop_var
 
-            if spread:
+            if spread is True:
                 task_vars.update(item)
             task_vars[loop_var] = item
             if index_var:
