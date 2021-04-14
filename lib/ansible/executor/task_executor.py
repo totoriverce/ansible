@@ -21,6 +21,7 @@ from ansible.executor.module_common import get_action_args_with_defaults
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.module_utils.six import binary_type
 from ansible.module_utils._text import to_text, to_native
+from ansible.module_utils.common.collections import Mapping
 from ansible.module_utils.connection import write_to_file_descriptor
 from ansible.playbook.conditional import Conditional
 from ansible.playbook.task import Task
@@ -285,6 +286,8 @@ class TaskExecutor:
             task_vars['ansible_loop_var'] = loop_var
 
             if spread is True:
+                if not isinstance(item, Mapping):
+                    raise AnsibleError('loop_control.spread can only be used with a mapping/dictionary. Got %r' % item.__class__.__name__)
                 task_vars.update(item)
             task_vars[loop_var] = item
             if index_var:
