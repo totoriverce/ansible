@@ -264,12 +264,12 @@ class TaskExecutor:
 
         self._task.loop_control.post_validate(templar=templar)
 
+        unpack = self._task.loop_control.unpack
         loop_var = self._task.loop_control.loop_var
         index_var = self._task.loop_control.index_var
         loop_pause = self._task.loop_control.pause
         extended = self._task.loop_control.extended
         extended_allitems = self._task.loop_control.extended_allitems
-        spread = self._task.loop_control.spread
         # ensure we always have a label
         label = self._task.loop_control.label or '{{' + loop_var + '}}'
 
@@ -285,9 +285,9 @@ class TaskExecutor:
         for item_index, item in enumerate(items):
             task_vars['ansible_loop_var'] = loop_var
 
-            if spread is True:
+            if unpack is True:
                 if not isinstance(item, Mapping):
-                    raise AnsibleError('loop_control.spread can only be used with a mapping/dictionary. Got %r' % item.__class__.__name__)
+                    raise AnsibleError('loop_control.unpack can only be used with a mapping/dictionary. Got %r' % item.__class__.__name__)
                 task_vars.update(item)
             task_vars[loop_var] = item
             if index_var:
