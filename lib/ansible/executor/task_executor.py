@@ -354,6 +354,7 @@ class TaskExecutor:
 
             res['_ansible_item_result'] = True
             res['_ansible_ignore_errors'] = task_fields.get('ignore_errors')
+            res['_ansible_loop_unpack'] = unpack
 
             # gets templated here unlike rest of loop_control fields, depends on loop_var above
             try:
