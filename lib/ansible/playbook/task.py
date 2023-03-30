@@ -390,13 +390,18 @@ class Task(Base, Conditional, Taggable, CollectionSearch, Notifiable, Delegatabl
         ret = {}
         projections = list(self.register.items()) if self.register else []
         for register, projection in projections:
+            if not isidentifier(register):
+                raise AnsibleError("Invalid variable name in 'register' specified: '%s'" % register)
+
             if projection in {'.', 'ansible_result'}:
                 ret[register] = result
                 continue
+
             if projection[:1] == '.':
                 template = f'{{{{ ansible_result{projection[1:]} }}}}'
             else:
                 template = f'{{{{ {projection} }}}}'
+
             new_vars = templar.available_variables.copy()
             new_vars['ansible_result'] = result
             with templar.set_temporary_context(available_variables=new_vars):

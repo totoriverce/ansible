@@ -776,10 +776,6 @@ class StrategyBase:
 
             # register final results
             if original_task.register:
-
-                if not isidentifier(original_task.register):
-                    raise AnsibleError("Invalid variable name in 'register' specified: '%s'" % original_task.register)
-
                 host_list = self.get_task_hosts(iterator, original_host, original_task)
 
                 clean_copy = strip_internal_keys(module_response_deepcopy(task_result._result))
