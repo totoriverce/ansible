@@ -21,6 +21,7 @@ import re
 
 from ansible import constants as C
 from ansible.errors import AnsibleError, AnsibleParserError, AnsibleUndefinedVariable, AnsibleAssertionError
+from ansible.module_utils.common.collections import Mapping
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.six import string_types
 from ansible.parsing.mod_args import ModuleArgsParser
@@ -161,7 +162,7 @@ class Task(Base, Conditional, Taggable, CollectionSearch, Notifiable, Delegatabl
         #                    version="2.10", collection_name='ansible.builtin')
 
     def _validate_register(self, attr, name, value):
-        if isinstance(value, string_types):
+        if value and not isinstance(value, Mapping):
             self.default_register = value
             value = {value: '.'}
         setattr(self, name, value)
