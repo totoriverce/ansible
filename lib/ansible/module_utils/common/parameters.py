@@ -90,6 +90,7 @@ PASS_VARS = {
     'keep_remote_files': ('_keep_remote_files', False),
     'module_name': ('_name', None),
     'no_log': ('no_log', False),
+    'private_env': ('_private_environment', {}),
     'remote_tmp': ('_remote_tmp', None),
     'selinux_special_fs': ('_selinux_special_fs', ['fuse', 'nfs', 'vboxsf', 'ramfs', '9p', 'vfat']),
     'shell_executable': ('_shell', '/bin/sh'),
@@ -207,7 +208,7 @@ def _handle_aliases(argument_spec, parameters, alias_warnings=None, alias_deprec
     each containing deprecation information for each alias found in argument_spec.
 
     :param argument_spec: Dictionary of parameters, their type, and valid values.
-    :type argument_spec: dict
+    type argument_spec: dict
 
     :param parameters: Dictionary of parameters.
     :type parameters: dict
