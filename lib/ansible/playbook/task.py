@@ -164,7 +164,7 @@ class Task(Base, Conditional, Taggable, CollectionSearch, Notifiable, Delegatabl
     def _validate_register(self, attr, name, value):
         if value and not isinstance(value, Mapping):
             self.default_register = value
-            value = {value: '.'}
+            value = {value: 'ansible_result'}
         setattr(self, name, value)
 
         items = value.items() if value else []
@@ -174,13 +174,12 @@ class Task(Base, Conditional, Taggable, CollectionSearch, Notifiable, Delegatabl
 
             # If no default register, but using projection syntax with a full result
             # set the default register to the first occurance
-            if projection in {'.', 'ansible_result'} and self.default_register is None:
+            if projection == 'ansible_result' and self.default_register is None:
                 self.default_register = register
 
-            if projection[0] != '.' and not _ANSIBLE_RESULT_RE.search(projection):
+            if not _ANSIBLE_RESULT_RE.search(projection):
                 raise AnsibleError(
-                    'register projection must be a raw jinja2 statement, containing "ansible_result" or starting '
-                    'with "." representing the result to process'
+                    'register projection must be a raw jinja2 statement, containing "ansible_result"'
                 )
 
     def preprocess_data(self, ds):
@@ -394,14 +393,11 @@ class Task(Base, Conditional, Taggable, CollectionSearch, Notifiable, Delegatabl
             if not isidentifier(register):
                 raise AnsibleError("Invalid variable name in 'register' specified: '%s'" % register)
 
-            if projection in {'.', 'ansible_result'}:
+            if projection == 'ansible_result':
                 ret[register] = result
                 continue
 
-            if projection[:1] == '.':
-                template = f'{{{{ ansible_result{projection[1:]} }}}}'
-            else:
-                template = f'{{{{ {projection} }}}}'
+            template = f'{{{{ {projection} }}}}'
 
             new_vars = templar.available_variables.copy()
             new_vars['ansible_result'] = result
