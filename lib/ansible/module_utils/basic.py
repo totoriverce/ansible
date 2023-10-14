@@ -449,6 +449,7 @@ class AnsibleModule(object):
         self._legal_inputs = []
         self._options_context = list()
         self._tmpdir = None
+        self._private_environment = {}
 
         if add_file_common_args:
             for k, v in FILE_COMMON_ARGUMENTS.items():
@@ -462,8 +463,13 @@ class AnsibleModule(object):
         # a known valid (LANG=C) if it's an invalid/unavailable locale
         self._check_locale()
 
+        # get input from controller
         self._load_params()
         self._set_internal_properties()
+
+        # setup env based on private env vars
+        for varname in self._private_environment.keys():
+            os.environ[varname] = self._private_environment[varname]
 
         self.validator = ModuleArgumentSpecValidator(self.argument_spec,
                                                      self.mutually_exclusive,
