@@ -568,7 +568,9 @@ def list_dict_option_schema(for_collection, plugin_type):
                     {
                         # This definition makes sure everything has the correct types/values
                         'why': doc_string,
-                        'alternatives': doc_string,
+                        # TODO: phase out either plural or singular, 'alt' is exclusive group
+                        Exclusive('alternative', 'alt'): doc_string,
+                        Exclusive('alternatives', 'alt'): doc_string,
                         # vod stands for 'version or date'; this is the name of the exclusive group
                         Exclusive('removed_at_date', 'vod'): date(),
                         Exclusive('version', 'vod'): version(for_collection),
@@ -577,7 +579,7 @@ def list_dict_option_schema(for_collection, plugin_type):
                     {
                         # This definition makes sure that everything we require is there
                         Required('why'): Any(*string_types),
-                        'alternatives': Any(*string_types),
+                        Required(Any('alternatives', 'alternative')): Any(*string_types),
                         Required(Any('removed_at_date', 'version')): Any(*string_types),
                         Required('collection_name'): Any(*string_types),
                     },
@@ -761,9 +763,15 @@ def return_schema(for_collection, plugin_type='module'):
 
 
 def deprecation_schema(for_collection):
+    alt_msg='Use either plural or singular, not both alternative(s)'
     main_fields = {
         Required('why'): doc_string,
-        Required('alternative'): doc_string,
+        Exclusive('plural', 'alt', msg=alt_msg):{
+            Required('alternatives'): doc_string
+        },
+        Exclusive('singular', 'alt', msg=alt_msg):{
+            Required('alternative'): doc_string
+        },
         Required('removed_from_collection'): collection_name,
         'removed': Any(True),
     }
