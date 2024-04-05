@@ -11,7 +11,7 @@ description:
 author:
     - Ansible Core Team
 deprecated:
-  alternatives: new_module
+  alternative: new_module
   why: Updated module released with more functionality
   removed_at_date: '2022-06-01'
   removed_in: '2.14'

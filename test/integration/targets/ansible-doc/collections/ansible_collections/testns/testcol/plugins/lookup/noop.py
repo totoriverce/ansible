@@ -11,7 +11,7 @@ DOCUMENTATION = """
     description:
       - this is a noop
     deprecated:
-        alternatives: Use some other lookup
+        alternative: Use some other lookup
         why: Test deprecation
         removed_in: '3.0.0'
     extends_documentation_fragment:
