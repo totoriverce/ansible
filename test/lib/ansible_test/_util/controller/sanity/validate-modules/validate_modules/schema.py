@@ -763,13 +763,13 @@ def return_schema(for_collection, plugin_type='module'):
 
 
 def deprecation_schema(for_collection):
-    alt_msg='Use either plural or singular, not both alternative(s)'
+    alt_msg = 'Use either plural or singular, not both alternative(s)'
     main_fields = {
         Required('why'): doc_string,
-        Exclusive('plural', 'alt', msg=alt_msg):{
+        Exclusive('plural', 'alt', msg=alt_msg): {
             Required('alternatives'): doc_string
         },
-        Exclusive('singular', 'alt', msg=alt_msg):{
+        Exclusive('singular', 'alt', msg=alt_msg): {
             Required('alternative'): doc_string
         },
         Required('removed_from_collection'): collection_name,
