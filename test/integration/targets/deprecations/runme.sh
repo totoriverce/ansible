@@ -2,6 +2,8 @@
 
 set -eux -o pipefail
 
+export ANSIBLE_DEPRECATION_WARNINGS=True
+
 # check for entry key valid, no deprecation
 [ "$(ANSIBLE_CONFIG='entry_key_not_deprecated.cfg' ansible -m meta -a 'noop'  localhost 2>&1 | grep -c 'DEPRECATION')" -eq "0" ]
 
