@@ -2084,5 +2084,3 @@ _Z_TEST_ENTRY_2:
   ini:
     - section: testing
       key: valid2
-    - section: testing
-      key: deprecated2
