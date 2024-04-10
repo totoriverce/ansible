@@ -772,9 +772,10 @@ def deprecation_schema(for_collection):
         Exclusive('singular', 'alt', msg=alt_msg): {
             Required('alternative'): doc_string
         },
-        Required('removed_from_collection'): collection_name,
-        'removed': Any(True),
     }
+
+    if for_collection:
+        main_fields.update({Required('removed_from_collection'): collection_name, 'removed': Any(True)})
 
     date_schema = {
         Required('removed_at_date'): date(),
