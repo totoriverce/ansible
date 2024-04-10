@@ -154,6 +154,17 @@ options:
             - When doing a C(contains) search, determine the encoding of the files to be searched.
         type: str
         version_added: "2.17"
+    checksum_algorithm:
+        description:
+        - Algorithm to determine checksum of file.
+        - Will throw an error if the host is unable to use specified algorithm.
+        - The remote host has to support the hashing method specified, V(md5)
+            can be unavailable if the host is FIPS-140 compliant.
+        type: str
+        choices: [ md5, sha1, sha224, sha256, sha384, sha512 ]
+        default: sha1
+        aliases: [ checksum, checksum_algo ]
+        version_added: "2.17"
 extends_documentation_fragment: action_common_attributes
 attributes:
     check_mode:
@@ -463,6 +474,9 @@ def main():
             hidden=dict(type='bool', default=False),
             follow=dict(type='bool', default=False),
             get_checksum=dict(type='bool', default=False),
+            checksum_algorithm=dict(type='str', default='sha1',
+                                    choices=['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512'],
+                                    aliases=['checksum', 'checksum_algo']),
             use_regex=dict(type='bool', default=False),
             depth=dict(type='int'),
             mode=dict(type='raw'),
@@ -560,7 +574,7 @@ def main():
 
                             r.update(statinfo(st))
                             if stat.S_ISREG(st.st_mode) and params['get_checksum']:
-                                r['checksum'] = module.sha1(fsname)
+                                r['checksum'] = module.digest_from_file(fsname, params['checksum_algorithm'])
 
                             if stat.S_ISREG(st.st_mode):
                                 if sizefilter(st, size):
@@ -585,7 +599,7 @@ def main():
 
                             r.update(statinfo(st))
                             if params['get_checksum']:
-                                r['checksum'] = module.sha1(fsname)
+                                r['checksum'] = module.digest_from_file(fsname, params['checksum_algorithm'])
                             filelist.append(r)
 
                     elif stat.S_ISLNK(st.st_mode) and params['file_type'] == 'link':
