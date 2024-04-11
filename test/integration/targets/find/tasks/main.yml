@@ -236,11 +236,19 @@
 
 - debug: var=find_by_specific_algo_res
 
-- assert:
-      that: "item.checksum == md5 | split(' ') | first"
+- name: get the md5 checksum by stat
+  register: all_files_st
+  stat:
+    get_checksum: true
+    checksum_algorithm: md5
+    path: "{{ item.path }}"
   loop: "{{ find_by_specific_algo_res.files }}"
-  vars:
-    md5: "{{ lookup('pipe', 'md5sum -z ' ~ remote_tmp_dir_test ~ '/' ~ (item.path | basename)) }}"
+
+- assert:
+      that: "all_files_st.results[index].stat.checksum == item.checksum"
+  loop: "{{ find_by_specific_algo_res.files }}"
+  loop_control:
+    index_var: index
 
 - name: read a gbk file by non-exists encoding
   find:
