@@ -160,11 +160,12 @@ options:
         - Will throw an error if the host is unable to use specified algorithm.
         - The remote host has to support the hashing method specified, V(md5)
             can be unavailable if the host is FIPS-140 compliant.
+        - Availability might be restricted by the target system, for example FIPS systems won't allow md5 use
         type: str
         choices: [ md5, sha1, sha224, sha256, sha384, sha512 ]
         default: sha1
         aliases: [ checksum, checksum_algo ]
-        version_added: "2.17"
+        version_added: "2.18"
 extends_documentation_fragment: action_common_attributes
 attributes:
     check_mode:
