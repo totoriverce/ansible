@@ -29,6 +29,9 @@ options:
             - You can choose seconds, minutes, hours, days, or weeks by specifying the
               first letter of any of those words (e.g., "1w").
         type: str
+    get_checksum:
+        default: no
+        version_added: 2.18
     patterns:
         default: []
         description:
@@ -131,11 +134,6 @@ options:
             - Set this to V(true) to follow symlinks in path for systems with python 2.6+.
         type: bool
         default: no
-    get_checksum:
-        description:
-            - Set this to V(true) to retrieve a file's SHA1 checksum.
-        type: bool
-        default: no
     use_regex:
         description:
             - If V(false), the patterns are file globs (shell).
@@ -154,19 +152,7 @@ options:
             - When doing a C(contains) search, determine the encoding of the files to be searched.
         type: str
         version_added: "2.17"
-    checksum_algorithm:
-        description:
-        - Algorithm to determine checksum of file.
-        - Will throw an error if the host is unable to use specified algorithm.
-        - The remote host has to support the hashing method specified, V(md5)
-            can be unavailable if the host is FIPS-140 compliant.
-        - Availability might be restricted by the target system, for example FIPS systems won't allow md5 use
-        type: str
-        choices: [ md5, sha1, sha224, sha256, sha384, sha512 ]
-        default: sha1
-        aliases: [ checksum, checksum_algo ]
-        version_added: "2.18"
-extends_documentation_fragment: action_common_attributes
+extends_documentation_fragment: [action_common_attributes, checksum_common]
 attributes:
     check_mode:
         details: since this action does not modify the target it just executes normally during check mode
