@@ -27,7 +27,6 @@ options:
     default: no
   get_checksum:
     default: yes
-    version_added: "1.8"
   get_mime:
     description:
       - Use file magic and return data about the nature of the file. this uses

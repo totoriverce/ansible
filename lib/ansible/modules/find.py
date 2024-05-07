@@ -31,7 +31,6 @@ options:
         type: str
     get_checksum:
         default: no
-        version_added: 2.18
     patterns:
         default: []
         description:
