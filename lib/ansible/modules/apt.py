@@ -1384,7 +1384,6 @@ def main():
                 tdelta = datetime.timedelta(seconds=p['cache_valid_time'])
                 if not mtimestamp + tdelta >= now:
                     # Retry to update the cache with exponential backoff
-                    err = ''
                     update_cache_retries = module.params.get('update_cache_retries')
                     update_cache_retry_max_delay = module.params.get('update_cache_retry_max_delay')
                     randomize = random.randint(0, 1000) / 1000.0
@@ -1394,16 +1393,17 @@ def main():
                             if not module.check_mode:
                                 cache.update()
                             break
-                        except apt.cache.FetchFailedException as e:
-                            err = to_native(e)
+                        except apt.cache.FetchFailedException:
+                            module.warn(f"Failed to update cache after {retry + 1} retries, retrying")
 
                         # Use exponential backoff plus a little bit of randomness
                         delay = 2 ** retry + randomize
                         if delay > update_cache_retry_max_delay:
                             delay = update_cache_retry_max_delay + randomize
                         time.sleep(delay)
+                        module.warn(f"Sleeping for {int(round(delay))} seconds, before attempting to refresh the cache again")
                     else:
-                        module.fail_json(msg='Failed to update apt cache: %s' % (err if err else 'unknown reason'))
+                        module.fail_json(msg=f'Failed to update apt cache after {update_cache_retries} retries')
 
                     cache.open(progress=None)
                     mtimestamp, post_cache_update_time = get_updated_cache_time()

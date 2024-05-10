@@ -319,17 +319,16 @@
     dest: /etc/apt/sources.list.d/non-existing.list
     content: deb http://ppa.launchpad.net/non-existing trusty main
 
-- name: test for sane error message
+- name: test for corrent error message
   apt:
     update_cache: yes
   register: apt_result
   ignore_errors: yes
 
-- name: verify sane error message
+- name: verify correct error message
   assert:
     that:
-      - "'Failed to fetch' in apt_result['msg']"
-      - "'403' in apt_result['msg']"
+      - "'Failed to update apt cache' in apt_result['msg']"
 
 - name: Clean up
   file:
