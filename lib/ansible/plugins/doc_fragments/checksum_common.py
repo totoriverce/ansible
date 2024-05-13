@@ -18,8 +18,11 @@ options:
         choices: [ md5, sha1, sha224, sha256, sha384, sha512 ]
         default: sha1
         aliases: [ checksum, checksum_algo ]
+        version_added: "2.0"
     get_checksum:
         description:
         - Whether to return a checksum of the file.
         type: bool
+        default: yes
+        version_added: "1.8"
 """

@@ -25,8 +25,6 @@ options:
       - Whether to follow symlinks.
     type: bool
     default: no
-  get_checksum:
-    default: yes
   get_mime:
     description:
       - Use file magic and return data about the nature of the file. this uses

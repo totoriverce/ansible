@@ -30,6 +30,8 @@ options:
               first letter of any of those words (e.g., "1w").
         type: str
     get_checksum:
+        description:
+            - Whether to return a checksum of the file.
         default: no
     patterns:
         default: []
