@@ -33,6 +33,8 @@ options:
         description:
             - Whether to return a checksum of the file.
         default: no
+    checksum_algorithm:
+        version_added: "2.18"
     patterns:
         default: []
         description:
