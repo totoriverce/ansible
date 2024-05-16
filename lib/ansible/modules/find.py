@@ -154,6 +154,15 @@ options:
             - When doing a C(contains) search, determine the encoding of the files to be searched.
         type: str
         version_added: "2.17"
+    max_matches:
+        description:
+            - Set the maximum number of matches to make before returning.
+            - Matches are made from the top, down (i.e. shallowest directory first).
+            - Set to V(-1) for unlimited matches.
+            - Default is unlimited matches.
+        type: int
+        default: -1
+        version_added: "2.18"
 extends_documentation_fragment: action_common_attributes
 attributes:
     check_mode:
@@ -227,6 +236,16 @@ EXAMPLES = r'''
       - '^_[0-9]{2,4}_.*.log$'
       - '^[a-z]{1,5}_.*log$'
 
+- name: Find file containing "wally" without necessarily reading all files
+  ansible.builtin.find:
+    paths: /var/log
+    file_type: file
+    contains: wally
+    read_whole_file: true
+    patterns: "^.*\\.log$"
+    use_regex: true
+    recurse: true
+    max_matches: 1
 '''
 
 RETURN = r'''
@@ -467,7 +486,8 @@ def main():
             depth=dict(type='int'),
             mode=dict(type='raw'),
             exact_mode=dict(type='bool', default=True),
-            encoding=dict(type='str')
+            encoding=dict(type='str'),
+            max_matches=dict(type='int', default=-1)
         ),
         supports_check_mode=True,
     )
@@ -520,6 +540,9 @@ def main():
         else:
             module.fail_json(size=params['size'], msg="failed to process size")
 
+    if params['max_matches'] == 0 or params['max_matches'] < -1:
+        module.fail_json(msg="max_matches cannot be %d (use -1 for unlimited)" % params['max_matches'])
+
     now = time.time()
     msg = 'All paths examined'
     looked = 0
@@ -530,7 +553,8 @@ def main():
             if not os.path.isdir(npath):
                 raise Exception("'%s' is not a directory" % to_native(npath))
 
-            for root, dirs, files in os.walk(npath, onerror=handle_walk_errors, followlinks=params['follow']):
+            # Setting `topdown=True` to explicitly guarantee matches are made from the shallowest directory first
+            for root, dirs, files in os.walk(npath, onerror=handle_walk_errors, followlinks=params['follow'], topdown=True):
                 looked = looked + len(files) + len(dirs)
                 for fsobj in (files + dirs):
                     fsname = os.path.normpath(os.path.join(root, fsobj))
@@ -596,7 +620,11 @@ def main():
                             r.update(statinfo(st))
                             filelist.append(r)
 
-                if not params['recurse']:
+                    if len(filelist) == params["max_matches"]:
+                        # Breaks out of directory files loop only
+                        break
+
+                if not params['recurse'] or len(filelist) == params["max_matches"]:
                     break
         except Exception as e:
             skipped[npath] = to_text(e)
