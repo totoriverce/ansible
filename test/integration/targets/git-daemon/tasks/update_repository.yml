@@ -1,0 +1,23 @@
+- block:
+  - name: "Cloning {{ repository }}"
+    shell: 'git clone git://localhost/{{ repository }} {{ repository }}'
+    args:
+      chdir: '{{ remote_tmp_dir }}'
+    when: '( shell_commands | length ) > 0'
+    register: cloned_repo
+
+  - name: "Running commands in {{ repository }}"
+    shell: "{{ cmd }}"
+    args:
+      chdir: "{{ remote_tmp_dir }}/{{ repository }}"
+    loop_control:
+      loop_var: cmd
+    loop: "{{ shell_commands }}"
+    register: update
+
+  always:
+    - name: "Removing {{ repository }}"
+      file:
+        path: "{{ remote_tmp_dir }}/{{ repository }}"
+        state: absent
+      when: cloned_repo is not skipped
