@@ -56,3 +56,79 @@
       that:
           - valid_env is success
           - invalid_env is failed
+
+
+- name: dump galaxy_server config
+  environment:
+    ANSIBLE_CONFIG: '{{ role_path }}/files/galaxy_server.ini'
+  vars:
+    expected:
+      my_org_hub:
+        url:
+          value: "https://automation.my_org/"
+          origin: role_path ~ "/files/galaxy_server.ini"
+        username:
+          value: my_user
+          origin: role_path ~ "/files/galaxy_server.ini"
+        password:
+          value: my_pass
+          origin: role_path ~ "/files/galaxy_server.ini"
+        api_version:
+          value: None
+          origin: default
+      release_galaxy:
+      test_galaxy:
+      my_galaxy_ng:
+  block:
+  - ansible.builtin.command: ansible-config dump --type {{ item }} --format json
+    loop:
+    - base
+    - all
+    register: galaxy_server_dump
+
+  - debug: msg='{{ (galaxy_server_dump.results[0].stdout | from_json) }}'
+
+  - set_fact:
+      galaxy_server_dump_base: '{{ (galaxy_server_dump.results[0].stdout | from_json).get("GALAXY_SERVERS") }}'
+      #galaxy_server_dump_all: '{{ (galaxy_server_dump.results[1].stdout | from_json | rejectattr("name", "defined")) }}'
+
+  - name: Check galaxy server values are present and match expectations
+    vars:
+      gs:
+        my_org_hub:
+          url: "https://automation.my_org/"
+          username: "my_user"
+          password: "my_pass"
+        release_galaxy:
+          url: "https://galaxy.ansible.com/"
+          token: "my_token"
+        test_galaxy:
+          url: "https://galaxy-dev.ansible.com/"
+          token: "my_test_token"
+        my_galaxy_ng:
+          url: "http://my_galaxy_ng:8000/api/automation-hub/"
+          token: "my_keycloak_access_token"
+          auth_url: "http://my_keycloak:8080/auth/realms/myco/protocol/openid-connect/token"
+          client_id: "galaxy-ng"
+      gs_all:
+          url:
+          token:
+          auth_url:
+          username:
+          password:
+          api_version:
+          timeout:
+      origin: '{{ role_path ~ "/files/galaxy_server.ini" }}'
+    block:
+    - debug: var=galaxy_server_dump_base[2]
+    - name: Check galaxy server config reflects what we expect
+      assert:
+        that:
+        - (galaxy_server_dump_base | count) == 4
+
+
+        - galaxy_server_dump_base[2].keys() | list == ["GALAXY_SERVER.TEST_GALAXY"]
+        #- (galaxy_server_dump_base[2].test_galaxy | selectattr("name", "equalto", "url"))[0].value == "https://galaxy-dev.ansible.com/"
+
+
+        - galaxy_server_dump_base == galaxy_server_dump_all
